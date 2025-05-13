@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Form Assistant</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 15px; 
+      width: 380px;
+      margin: 0;
+      color: #333;
+    }
+    
+    h3 {
+      margin-top: 0;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #444;
+    }
+    
+    input, button, select, textarea {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+    
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    button:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
+    }
+    
+    button.secondary {
+      background-color: #f1f1f1;
+      color: #333;
+    }
+    
+    button.secondary:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .status {
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+    
+    .error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    
+    .success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .info {
+      background-color: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    hr {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 10px 0;
+    }
+    
+    .key-status {
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    
+    .fill-button {
+      background-color: #27ae60;
+    }
+    
+    .fill-button:hover {
+      background-color: #219955;
+    }
+    
+    .button-icon {
+      width: 16px;
+      height: 16px;
+    }
+    
+    footer {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom-color: #3498db;
+      color: #3498db;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      background-color: #f5f7fa;
+    }
+    
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      color: #3498db;
+    }
+    
+    .feature-text {
+      flex: 1;
+    }
+    
+    .feature-title {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    
+    .feature-description {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .document-upload {
+      border: 2px dashed #ddd;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .document-name {
+      font-size: 12px;
+      margin-top: 5px;
+      color: #2980b9;
+      word-break: break-all;
+    }
+    
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #27ae60;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    
+    .advanced-options {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .model-selector {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .question-input {
+      width: 100%;
+      resize: vertical;
+      min-height: 60px;
+      margin-bottom: 10px;
+    }
+    
+    .ai-response {
+      background-color: #f1f9ff;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 14px;
+      border-left: 3px solid #3498db;
+    }
+  </style>
+</head>
+<body>
+  <h3>
+    <img src="icons/icon48.png" alt="Logo" class="logo">
+    AI Form Assistant
+  </h3>
+  
+  <div class="tabs">
+    <div class="tab active" data-tab="fill">Fill Form</div>
+    <div class="tab" data-tab="ask">Ask AI</div>
+    <div class="tab" data-tab="settings">Settings</div>
+  </div>
+  
+  <div id="fill-tab" class="tab-content active">
+    <div class="feature-row">
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <div class="feature-text">
+        <div class="feature-title">Upload Document for Context</div>
+        <div class="feature-description">Provide a document to help the AI understand specific context when filling forms</div>
+      </div>
+    </div>
+    
+    <div class="document-upload">
+      <input type="file" id="documentUpload" accept=".txt,.pdf,.doc,.docx,.rtf" style="display: none;">
+      <button id="uploadBtn" class="secondary">
+        <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        Upload Document
+      </button>
+      <div id="documentName" class="document-name"></div>
+    </div>
+    
+    <div class="toggle-container">
+      <label>Smart Form Detection</label>
+      <label class="toggle">
+        <input type="checkbox" id="smartDetection" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="toggle-container">
+      <label>Contextual Responses</label>
+      <label class="toggle">
+        <input type="checkbox" id="contextualResponses" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <button id="fillFormBtn" class="fill-button">
+      <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      Fill Form with AI
+    </button>
+    
+    <div class="advanced-options">
+      <details>
+        <summary>Advanced Options</summary>
+        <div style="margin-top: 10px;">
+          <div class="form-group">
+            <label for="modelSelector">AI Model:</label>
+            <select id="modelSelector" class="model-selector">
+              <option value="gpt-4-turbo" selected>GPT-4 Turbo (Recommended)</option>
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Faster)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="responseVariation">Response Variation:</label>
+            <select id="responseVariation" class="model-selector">
+              <option value="0.7" selected>Balanced (Default)</option>
+              <option value="0.9">High Creativity</option>
+              <option value="0.5">More Consistent</option>
+              <option value="0.3">Very Consistent</option>
+            </select>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+  
+  <div id="ask-tab" class="tab-content">
+    <div class="form-group">
+      <label for="questionInput">Ask a question:</label>
+      <textarea id="questionInput" class="question-input" placeholder="E.g., How should I answer questions about my work experience?"></textarea>
+    </div>
+    
+    <div class="toggle-container">
+      <label>Use Document Context</label>
+      <label class="toggle">
+        <input type="checkbox" id="useDocumentContext">
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <button id="askButton">
+      <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      Ask AI
+    </button>
+    
+    <div id="aiResponse" class="ai-response" style="display: none;"></div>
+  </div>
+  
+  <div id="settings-tab" class="tab-content">
+    <div class="form-group">
+      <label for="apiKey">OpenAI API Key:</label>
+      <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" />
+      <div id="keyStatus" class="key-status"></div>
+    </div>
+    
+    <button id="saveKeyBtn">
+      <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+      Save API Key
+    </button>
+    
+    <hr>
+    
+    <div class="toggle-container">
+      <label>Show Icon on Form Fields</label>
+      <label class="toggle">
+        <input type="checkbox" id="showFieldIcons" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="toggle-container">
+      <label>Auto-detect Form Type</label>
+      <label class="toggle">
+        <input type="checkbox" id="autoDetectForm" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="toggle-container">
+      <label>Suggestions Panel</label>
+      <label class="toggle">
+        <input type="checkbox" id="showSuggestions" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <hr>
+    
+    <button id="clearHistoryBtn" class="secondary">
+      <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+      Clear Response History
+    </button>
+  </div>
+  
+  <div id="status" class="status"></div>
+  
+  <footer>
+    AI Form Assistant v1.2 - Smart form filling with AI
+  </footer>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
